@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área de Arbitraje | Portafolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+
+    <!-- Navegación superior -->
+    <nav class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="text-sm font-semibold text-blue-400 hover:underline">&larr; Volver al Inicio</a>
+            <span class="font-bold text-white">Área Arbitral</span>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 py-10 w-full space-y-8">
+        
+        <header class="border-b border-slate-800 pb-4">
+            <h1 class="text-3xl font-extrabold text-white">Bitácora y Gestión de Partidos</h1>
+            <p class="text-slate-400 text-sm mt-1">Toca los botones de estado para actualizarlos o añade nuevos registros desde tu iPad.</p>
+        </header>
+
+        <!-- Formulario para añadir partido -->
+        <section class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6">
+            <h2 class="text-lg font-semibold text-blue-400 mb-4">Añadir Nuevo Partido / Registro</h2>
+            <form id="partido-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Categoría / Encuentro</label>
+                    <input type="text" id="input-titulo" required placeholder="Ej: Cadete Masculino - Jornada 4" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-1">Notas Clave / Evaluación</label>
+                    <input type="text" id="input-notas" required placeholder="Ej: Buena fluidez, revisar criterio en faltas de tiro" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-colors">
+                    Guardar Partido
+                </button>
+            </form>
+        </section>
+
+        <!-- Listado de Partidos (Dinámico) -->
+        <section class="space-y-4">
+            <h2 class="text-lg font-semibold text-white">Historial de Registros</h2>
+            <div id="lista-partidos" class="space-y-3">
+                <!-- Los partidos añadidos o interactivos aparecerán aquí -->
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        <p>Espacio exclusivo de Arbitraje &bull; iPad Optimized</p>
+    </footer>
+
+    <!-- Script de Interactividad y Memoria Local -->
+    <script>
+        const form = document.getElementById('partido-form');
+        const lista = document.getElementById('lista-partidos');
+
+        // Cargar datos guardados en el iPad al abrir la página
+        let partidos = JSON.parse(localStorage.getItem('mis_partidos')) || [
+            { titulo: "Amateur / Oficial - Control de Ritmo", notas: "Evaluación positiva en comunicación preventiva.", estado: "Superado" },
+            { titulo: "Categoría Base - Criterio de Contactos", notas: "Área de mejora en marcaje exterior.", estado: "En revisión" }
+        ];
+
+        function guardarYRenderizar() {
+            localStorage.setItem('mis_partidos', JSON.stringify(partidos));
+            renderizar();
+        }
+
+        function cambiarEstado(index) {
+            const estados = ["En revisión", "Superado", "No superado"];
+            let actual = estados.indexOf(partidos[index].estado);
+            let siguiente = (actual + 1) % estados.length;
+            partidos[index].estado = estados[siguiente];
+            guardarYRenderizar();
+        }
+
+        function renderizar() {
+            lista.innerHTML = "";
+            partidos.forEach((p, index) => {
+                let colorEstado = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                if (p.estado === "Superado") colorEstado = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                if (p.estado === "No superado") colorEstado = "bg-rose-500/10 text-rose-400 border-rose-500/20";
+
+                const div = document.createElement('div');
+                div.className = "bg-slate-800/40 p-4 rounded-xl border border-slate-700/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3";
+                div.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-white text-sm">${p.titulo}</h4>
+                        <p class="text-slate-400 text-xs mt-1">${p.notas}</p>
+                    </div>
+                    <button onclick="cambiarEstado(${index})" class="text-xs px-3 py-1.5 rounded-lg border font-semibold transition-all ${colorEstado} hover:opacity-80">
+                        Estado: ${p.estado} (Tocar)
+                    </button>
+                `;
+                lista.appendChild(div);
+            });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nuevoTitulo = document.getElementById('input-titulo').value;
+            const nuevasNotas = document.getElementById('input-notas').value;
+            
+            partidos.unshift({ titulo: nuevoTitulo, notas: nuevasNotas, estado: "En revisión" });
+            guardarYRenderizar();
+            form.reset();
+        });
+
+        renderizar();
+    </script>
+</body>
+</html>
