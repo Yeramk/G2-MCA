@@ -1,181 +1,43 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portafolio | Arbitraje & Estudiantes</title>
-    <!-- Tailwind CSS -->
+    <title>Centro de Operaciones | Portafolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            dark: '#0f172a',
-                            card: '#1e293b',
-                            border: '#334155'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-blue-500 selection:text-white">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+    
+    <header class="py-16 px-6 text-center max-w-3xl mx-auto space-y-4">
+        <span class="bg-blue-600/20 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-blue-500/30">Plataforma V1.2</span>
+        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white">Selecciona tu Sección</h1>
+        <p class="text-slate-400 text-base">Accede de forma independiente a tus espacios de gestión y rendimiento.</p>
+    </header>
 
-    <!-- Barra de Navegación Fija (Sticky) -->
-    <nav class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
-            <span class="font-extrabold tracking-tight text-lg bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                PORTAFOLIO V1.1
-            </span>
-            <div class="hidden sm:flex space-x-6 text-sm font-medium text-slate-300">
-                <a href="#arbitraje" class="hover:text-blue-400 transition-colors">Área Arbitral</a>
-                <a href="#estudiantes" class="hover:text-emerald-400 transition-colors">Estudiantes & Liderazgo</a>
-                <a href="#proposito" class="hover:text-slate-100 transition-colors">Sobre Mí</a>
+    <main class="max-w-4xl mx-auto px-6 w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+        <!-- Enlace a Arbitraje -->
+        <a href="arbitraje.html" class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-8 hover:border-blue-500 transition-all flex flex-col justify-between group">
+            <div>
+                <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 text-2xl font-bold mb-4 border border-blue-500/20">哨</div>
+                <h2 class="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">Área de Arbitraje</h2>
+                <p class="text-slate-400 mt-2 text-sm">Bitácora de partidos, objetivos y control de criterios técnicos con estados interactivos.</p>
             </div>
-            <span class="bg-blue-500/10 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full border border-blue-500/20">
-                iPad Ready
-            </span>
-        </div>
-    </nav>
+            <span class="mt-6 text-sm font-semibold text-blue-400 flex items-center">Entrar al área &rarr;</span>
+        </a>
 
-    <!-- Contenido Principal -->
-    <main class="max-w-5xl mx-auto px-6 py-10 w-full space-y-16">
-        
-        <!-- Cabecera / Presentación -->
-        <header class="text-center max-w-3xl mx-auto space-y-4">
-            <span class="inline-block bg-blue-600/20 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-blue-500/30">
-                Centro de Operaciones y Gestión
-            </span>
-            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white">
-                Criterio, Liderazgo y Acción
-            </h1>
-            <p class="text-slate-400 text-base sm:text-lg leading-relaxed">
-                Plataforma unificada para la trazabilidad de mi rendimiento arbitral, la gestión de proyectos académicos y las iniciativas de representación estudiantil.
-            </p>
-        </header>
-
-        <!-- SECCIÓN 1: ARBITRAJE -->
-        <section id="arbitraje" class="space-y-6 pt-4">
-            <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 text-xl font-bold border border-blue-500/20">哨</div>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Área de Arbitraje</h2>
-                    <p class="text-slate-400 text-xs sm:text-sm">Bitácora de partidos, evolución técnica y objetivos de temporada</p>
-                </div>
+        <!-- Enlace a Estudiantes -->
+        <a href="estudiantes.html" class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-8 hover:border-emerald-500 transition-all flex flex-col justify-between group">
+            <div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-2xl font-bold mb-4 border border-emerald-500/20">📚</div>
+                <h2 class="text-2xl font-bold text-white group-hover:text-emerald-400 transition-colors">Instituto & Estudiantes</h2>
+                <p class="text-slate-400 mt-2 text-sm">Gestión de proyectos académicos, representación estudiantil y actas.</p>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Bitácora Reciente -->
-                <div class="md:col-span-2 bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 backdrop-blur-sm">
-                    <h3 class="text-lg font-semibold text-blue-400 mb-4 flex items-center justify-between">
-                        <span>Últimos Encuentros / Bitácora</span>
-                        <span class="text-xs bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded">Temporada Activa</span>
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                            <div>
-                                <span class="text-xs text-blue-400 font-semibold uppercase">Amateur / Oficial</span>
-                                <h4 class="font-bold text-white text-sm">Gestión de Ritmo y Control de Banquillos</h4>
-                                <p class="text-slate-400 text-xs mt-1">Evaluación positiva en comunicación preventiva y aplicación de ventajas.</p>
-                            </div>
-                            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded">Superado</span>
-                        </div>
-                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                            <div>
-                                <span class="text-xs text-blue-400 font-semibold uppercase">Categoría Base / Semiprofesional</span>
-                                <h4 class="font-bold text-white text-sm">Criterio de Contactos en Transición</h4>
-                                <p class="text-slate-400 text-xs mt-1">Área de mejora: unificar el rasero en faltas de marcaje exterior.</p>
-                            </div>
-                            <span class="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-1 rounded">En revisión</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Objetivos Técnicos -->
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 backdrop-blur-sm flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-lg font-semibold text-blue-400 mb-4">Metas de Temporada</h3>
-                        <ul class="space-y-3 text-sm text-slate-300">
-                            <li class="flex items-start space-x-2">
-                                <span class="text-blue-400 font-bold">✓</span>
-                                <span>Ascenso de categoría en competiciones territoriales.</span>
-                            </li>
-                            <li class="flex items-start space-x-2">
-                                <span class="text-blue-400 font-bold">✓</span>
-                                <span>Optimización física y control de tiempos muertos.</span>
-                            </li>
-                            <li class="flex items-start space-x-2">
-                                <span class="text-blue-400 font-bold">✓</span>
-                                <span>Registro sistemático post-partido para análisis de comités.</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-slate-700/40 text-xs text-slate-500 text-center">
-                        Actualizado semanalmente
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECCIÓN 2: ESTUDIANTES E INSTITUTO -->
-        <section id="estudiantes" class="space-y-6 pt-4">
-            <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
-                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl font-bold border border-emerald-500/20">📚</div>
-                <div>
-                    <h2 class="text-2xl font-bold text-white">Instituto y Representación Estudiantil</h2>
-                    <p class="text-slate-400 text-xs sm:text-sm">Gestión de proyectos académicos, actas y liderazgo institucional</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Bloque Representación -->
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 backdrop-blur-sm space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-emerald-400">Consejo Escolar & Delegados</h3>
-                        <span class="text-xs bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 px-2.5 py-0.5 rounded">Gestión Activa</span>
-                    </div>
-                    <p class="text-slate-300 text-sm leading-relaxed">
-                        Coordinación y defensa de propuestas del alumnado ante los órganos de gobierno del centro. Intervenciones en plenos y recopilación estructurada de demandas colectivas.
-                    </p>
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/40 text-xs text-slate-400">
-                        <strong class="text-white">Último hito:</strong> Presentación de informe de necesidades estudiantiles en el cierre del curso académico.
-                    </div>
-                </div>
-
-                <!-- Bloque Proyectos Académicos -->
-                <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 backdrop-blur-sm space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-emerald-400">Proyectos e Investigaciones</h3>
-                        <span class="text-xs bg-slate-700 text-slate-300 px-2.5 py-0.5 rounded">Académico</span>
-                    </div>
-                    <p class="text-slate-300 text-sm leading-relaxed">
-                        Desarrollo de trabajos monográficos y estructuración de contenidos complejos con rigor metodológico y documentación organizada.
-                    </p>
-                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/40 text-xs text-slate-400">
-                        <strong class="text-white">Enfoque:</strong> Rigor expositivo, organización documental y defensa argumental.
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECCIÓN 3: PROPÓSITO TRANSVERSAL -->
-        <section id="proposito" class="bg-gradient-to-r from-slate-800/60 to-slate-800/20 border border-slate-700/60 rounded-2xl p-8 backdrop-blur-sm text-center max-w-3xl mx-auto space-y-4">
-            <h3 class="text-xl font-bold text-white">¿Por qué unir estos dos mundos?</h3>
-            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                Tanto en la cancha de baloncesto tomando decisiones bajo máxima presión como en la representación estudiantil negociando soluciones, la base es la misma: <strong class="text-white">autoridad templada, imparcialidad, resolución de conflictos y un compromiso férreo con la organización</strong>. Este portal refleja esa dualidad de liderazgo.
-            </p>
-        </section>
-
+            <span class="mt-6 text-sm font-semibold text-emerald-400 flex items-center">Entrar al área &rarr;</span>
+        </a>
     </main>
 
-    <!-- Pie de página -->
-    <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 space-y-2 mt-12">
-        <p>Versión 1.1 &bull; Alojado en GitHub Pages &bull; Gestionado y optimizado desde iPad</p>
-        <p class="text-slate-600">Diseñado con estructura modular y control de versiones.</p>
+    <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        <p>Alojado en GitHub Pages &bull; Control Total desde el iPad</p>
     </footer>
-
 </body>
 </html>
