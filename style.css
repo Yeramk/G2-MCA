@@ -1,0 +1,50 @@
+:root {
+  --fondo-app: #f2f2f7;
+  --blanco: #ffffff;
+  --texto-principal: #1c1c1e;
+  --texto-secundario: #8e8e93;
+  --rosa-principal: #ff2d55;
+  --rosa-suave: #ff2d5515;
+  --rojo-alerta: #ff3b30;
+  --naranja: #ff9500;
+  --azul: #007aff;
+  --sombra-ios: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--fondo-app);
+  color: var(--texto-principal);
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.app-container { width: 100%; max-width: 900px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;}
+.saludo p { margin: 4px 0 0 0; color: var(--texto-secundario); font-size: 15px; }
+.perfil { width: 45px; height: 45px; background-color: var(--rosa-principal); border-radius: 50%; opacity: 0.8;}
+
+.banner-inteligente { background-color: var(--rosa-suave); border-radius: 16px; padding: 16px 20px; display: flex; gap: 15px; align-items: center; margin-bottom: 30px; }
+.banner-inteligente p { margin: 0; font-size: 14px; line-height: 1.4; color: var(--rosa-principal); font-weight: 500;}
+
+.grid-principal { display: grid; grid-template-columns: 1fr; gap: 30px; }
+@media (min-width: 768px) { .grid-principal { grid-template-columns: 1.5fr 1fr; } }
+
+h2 { font-size: 18px; margin-top: 0; margin-bottom: 20px; font-weight: 600;}
+
+.tarjeta-estudio { background-color: var(--blanco); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: var(--sombra-ios); display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--rosa-principal); }
+.info-asignatura h3 { margin: 0; font-size: 18px; }
+.minutos { font-size: 14px; color: var(--texto-secundario); margin-top: 5px; display: block;}
+
+.seccion-contexto { background-color: var(--blanco); border-radius: 24px; padding: 25px; box-shadow: var(--sombra-ios); height: fit-content;}
+.lista-examenes { list-style: none; padding: 0; margin: 0; }
+.lista-examenes li { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; }
+.fecha-etiqueta { padding: 10px; border-radius: 12px; font-weight: 600; font-size: 14px; color: #fff; text-align: center; width: 45px;}
+.roja { background-color: var(--rojo-alerta); }
+.naranja { background-color: var(--naranja); }
+.azul { background-color: var(--azul); }
+.info strong { display: block; font-size: 16px; margin-bottom: 2px;}
+.info span { font-size: 13px; color: var(--texto-secundario); }
