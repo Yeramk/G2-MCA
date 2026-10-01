@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. LOS DATOS INICIALES
-  const minutosDisponibles = 180; // Las horas de hoy
+  const minutosDisponibles = 180; 
   const fechaHoy = new Date('2026-10-01');
 
   const asignaturas = [
@@ -9,14 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
     { nombre: 'FP', temas: 7, dificultad: 2.0, fechaExamen: new Date('2026-10-26') }   
   ];
 
-  // 2. EL CÁLCULO MATEMÁTICO
   let asignaturasConUrgencia = [];
   let urgenciaTotal = 0;
 
   asignaturas.forEach(asig => {
     const diferenciaTiempo = asig.fechaExamen - fechaHoy;
     const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24)); 
-    
     const puntosCarga = asig.temas * asig.dificultad;
     const urgencia = puntosCarga / diasRestantes;
     
@@ -36,24 +33,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 3. PINTAR EL RESULTADO EN LA WEB
   const contenedor = document.getElementById('contenedor-plan');
   contenedor.innerHTML = ''; 
+
+  // Variable para simular los bloques (Sesión 1, Sesión 2...)
+  let contadorSesion = 1;
 
   planDeHoy.forEach(plan => {
     const horas = Math.floor(plan.minutos / 60);
     const mins = plan.minutos % 60;
     const textoTiempo = horas > 0 ? `${horas}h ${mins > 0 ? mins + 'm' : ''}` : `${mins}m`;
 
-    const tarjeta = document.createElement('div');
-    tarjeta.className = 'tarjeta-estudio';
-    tarjeta.innerHTML = `
-      <div class="info-asignatura">
-        <h3>${plan.nombre}</h3>
-        <span class="minutos">Toca estudiar: ${textoTiempo}</span>
+    // Creamos el elemento con la estructura exacta de la Timeline
+    const itemTimeline = document.createElement('div');
+    itemTimeline.className = 'timeline-item activo';
+    
+    itemTimeline.innerHTML = `
+      <div class="hora">Sesión ${contadorSesion}</div>
+      <div class="punto punto-estudio"></div>
+      <div class="contenido-item tarjeta-estudio">
+        <div class="info-estudio">
+          <h4>${plan.nombre}</h4>
+          <p>Tiempo objetivo: ${textoTiempo}</p>
+        </div>
+        <button class="btn-check"></button>
       </div>
-      <div style="width: 25px; height: 25px; border-radius: 50%; border: 2px solid var(--rosa-principal);"></div>
     `;
-    contenedor.appendChild(tarjeta);
+    
+    contenedor.appendChild(itemTimeline);
+    contadorSesion++;
   });
 });
