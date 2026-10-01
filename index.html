@@ -7,49 +7,113 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app-container">
-    <header class="header">
-      <div class="saludo">
-        <h1>Hola, [Nombre] 👋</h1>
-        <p>Jueves, 1 de octubre de 2026</p>
+  <div class="dashboard">
+    <!-- MENÚ LATERAL -->
+    <nav class="sidebar">
+      <div class="logo">
+        <div class="logo-circulo"></div>
+        <span>Planificador</span>
       </div>
-      <div class="perfil"></div>
-    </header>
+      <ul class="menu-items">
+        <li class="active">📊 Panel de Hoy</li>
+        <li>📅 Calendario</li>
+        <li>📚 Asignaturas</li>
+        <li>🏀 Baloncesto</li>
+        <li>⚙️ Ajustes</li>
+      </ul>
+    </nav>
 
-    <div class="banner-inteligente">
-      <span class="icono">🧠</span>
-      <p>He repartido tus horas libres de hoy. CED y ADE tienen prioridad porque sus exámenes están más cerca.</p>
-    </div>
-
-    <main class="grid-principal">
-      <section class="seccion-timeline">
-        <h2>Plan sugerido para hoy</h2>
-        <div id="contenedor-plan" class="timeline">
-          <!-- El JavaScript inyectará las tarjetas aquí -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido-principal">
+      <header class="cabecera">
+        <div>
+          <h1>Hola, [Nombre] 👋</h1>
+          <p class="fecha">Jueves, 1 de octubre de 2026</p>
         </div>
-      </section>
+      </header>
 
-      <section class="seccion-contexto">
-        <h2>Próximos objetivos</h2>
-        <ul class="lista-examenes">
-          <li>
-            <div class="fecha-etiqueta roja">21 Oct</div>
-            <div class="info"><strong>CED</strong><span>Alta dificultad</span></div>
-          </li>
-          <li>
-            <div class="fecha-etiqueta naranja">23 Oct</div>
-            <div class="info"><strong>ADE</strong><span>Dificultad media</span></div>
-          </li>
-          <li>
-            <div class="fecha-etiqueta azul">26 Oct</div>
-            <div class="info"><strong>FP</strong><span>Alta dificultad</span></div>
-          </li>
-        </ul>
-      </section>
+      <!-- BANNER INTELIGENTE -->
+      <div class="alerta-inteligente">
+        <div class="icono-alerta">🧠</div>
+        <div class="texto-alerta">
+          <strong>Ajuste automático:</strong> Hoy no tienes clases presenciales[span_0](start_span)[span_0](end_span). He concentrado el estudio para dejarte la tarde libre antes de tu entreno (20:30).
+        </div>
+      </div>
+
+      <div class="grid-dashboard">
+        
+        <!-- COLUMNA IZQUIERDA: LÍNEA DE TIEMPO -->
+        <section class="columna-timeline">
+          <h2 class="titulo-seccion">Tu día al detalle</h2>
+          
+          <div class="timeline">
+            <!-- Bloque U.S. (Estático) -->
+            <div class="timeline-item inactivo">
+              <div class="hora">08:30 - 14:00</div>
+              <div class="punto"></div>
+              <div class="contenido-item">
+                <h4>Libre de clases</h4>
+                <p>Según horario U.S.</p>
+              </div>
+            </div>
+
+            <!-- AQUÍ EL JAVASCRIPT INYECTARÁ LOS CÁLCULOS MATEMÁTICOS -->
+            <div id="contenedor-plan"></div>
+
+            <!-- Bloque Tarde -->
+            <div class="timeline-item inactivo">
+              <div class="hora">Tarde</div>
+              <div class="punto"></div>
+              <div class="contenido-item">
+                <h4>Descanso / Tiempo Libre</h4>
+              </div>
+            </div>
+
+            <!-- Bloque Baloncesto (Estático) -->
+            <div class="timeline-item especial">
+              <div class="hora">20:30 - 22:00</div>
+              <div class="punto punto-basket"></div>
+              <div class="contenido-item tarjeta-basket">
+                <h4>🏀 Entreno CD Colegio Claret</h4>
+                <p>No olvides preparar la mochila.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- COLUMNA DERECHA: CONTEXTO -->
+        <section class="columna-contexto">
+          <div class="tarjeta-modulo">
+            <h3 class="titulo-modulo">Próximos eventos</h3>
+            <ul class="lista-eventos">
+              <li class="evento-basket">
+                <div class="fecha-etiqueta amarilla">3 Oct</div>
+                <div class="info-evento">
+                  <strong>vs. CB Fresas (Local)</strong>
+                  <span>Pab. Colegio Claret • 17:00</span>
+                </div>
+              </li>
+              <li class="evento-examen">
+                <div class="fecha-etiqueta roja">21 Oct</div>
+                <div class="info-evento">
+                  <strong>Examen: CED</strong>
+                  <span>Alta prioridad</span>
+                </div>
+              </li>
+              <li class="evento-personal">
+                <div class="fecha-etiqueta naranja">23 Oct</div>
+                <div class="info-evento">
+                  <strong>Examen: ADE</strong>
+                  <span>Prioridad media</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+      </div>
     </main>
   </div>
-
-  <!-- Aquí conectamos el cerebro matemático -->
   <script src="script.js"></script>
 </body>
 </html>
