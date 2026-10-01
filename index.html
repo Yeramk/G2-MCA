@@ -464,7 +464,7 @@
                 </div>
               </div>
 
-              <!-- Bloques inyectados dinámicamente con cálculo de tiempo real -->
+              <!-- Bloques inyectados dinámicamente -->
               <div id="contenedor-plan" style="display: contents;"></div>
 
               <div class="timeline-item">
@@ -617,7 +617,7 @@
 
   <script>
     const SUPABASE_URL = 'https://ttzqgnrrjpgoadlylmwq.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6InFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -682,10 +682,8 @@
       });
     });
 
-    // Motor de cálculo con franjas horarias dinámicas y seguras
     async function cargarPanelHoy() {
       const minutosDisponibles = 180; 
-      // Normalización segura de fecha local para evitar desfases UTC
       const fechaHoy = new Date('2026-10-01T00:00:00');
 
       const { data: asignaturas, error } = await supabaseClient
@@ -695,7 +693,13 @@
       const contenedor = document.getElementById('contenedor-plan');
       contenedor.innerHTML = ""; 
 
-      if (error || !asignaturas || asignaturas.length === 0) {
+      if (error) {
+        console.error("Error detallado Supabase:", error);
+        contenedor.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Error de conexión: ${error.message}</p></div>`;
+        return;
+      }
+
+      if (!asignaturas || asignaturas.length === 0) {
         contenedor.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Sin asignaturas registradas en la nube.</p></div>`;
         return;
       }
@@ -708,7 +712,6 @@
         const diferenciaTiempo = fechaExamen - fechaHoy;
         const diasRestantes = Math.max(1, Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24))); 
         
-        // Ponderación exacta: Temas * Dificultad (1 a 5)
         const puntosCarga = asig.temas * asig.dificultad;
         const urgencia = puntosCarga / diasRestantes;
         
@@ -722,14 +725,13 @@
         let porcentaje = asig.urgencia / urgenciaTotal;
         let minutosAsignados = minutosDisponibles * porcentaje;
 
-        if (minutosAsignados >= 30) { // Umbral rebajado a 30m para mayor flexibilidad
+        if (minutosAsignados >= 30) {
           let minutosRedondeados = Math.round(minutosAsignados / 15) * 15;
           planDeHoy.push({ nombre: asig.nombre, minutos: minutosRedondeados });
         }
       });
 
-      // Generador dinámico de horas (Inicia a las 10:00 AM y calcula bloques consecutivos reales)
-      let horaActualMinutos = 10 * 60; // 10:00 en minutos desde medianoche
+      let horaActualMinutos = 10 * 60; 
 
       planDeHoy.forEach((plan) => {
         const inicioH = Math.floor(horaActualMinutos / 60);
@@ -762,7 +764,7 @@
           </div>
         `;
         
-        contenedor.appendChild(itemTimeline);
+        contenedor.appendChild(itemItemTimeline = itemTimeline);
       });
     }
 
@@ -774,12 +776,13 @@
         .from('asignaturas')
         .select('*');
 
-      if (error || !asignaturas) {
-        contenedorCrud.innerHTML = "<p style='color: red;'>Error al cargar las materias.</p>";
+      if (error) {
+        console.error("Error detallado CRUD Supabase:", error);
+        contenedorCrud.innerHTML = `<p style='color: red;'>Error al cargar: ${error.message}</p>`;
         return;
       }
 
-      if (asignaturas.length === 0) {
+      if (!asignaturas || asignaturas.length === 0) {
         contenedorCrud.innerHTML = "<p style='color: var(--texto-gris);'>No hay asignaturas registradas.</p>";
         return;
       }
@@ -794,7 +797,7 @@
             <strong style="font-size: 15px;">${asig.nombre}</strong><br>
             <span style="font-size: 13px; color: var(--texto-gris);">Temas: ${asig.temas} • Dificultad: ${asig.dificultad}/5 • Examen: ${asig.fecha_examen}</span>
           </div>
-          <span style="color: var(--rosa-pastel); font-weight: 600; font-size: 13px;">Editar ✏️</span>
+          <span style="color: var(--rosa-pastel); font-weight: 600; font-size: 13px;">Editar ✏️️</span>
         `;
         contenedorCrud.appendChild(div);
       });
