@@ -461,48 +461,15 @@
         <div class="alerta-inteligente">
           <div class="icono-alerta">🧠</div>
           <div class="texto-alerta">
-            <strong>Planificador autónomo:</strong> Calculando automáticamente el tiempo de estudio según las horas libres y la carga acumulada en Supabase.
+            <strong>Planificador autónomo:</strong> Jornada organizada de forma inteligente según el día actual, clases de US y Supabase.
           </div>
         </div>
 
         <div class="grid-dashboard">
           <section class="columna-timeline">
             <h2 class="titulo-seccion">Tu día al detalle</h2>
-            <div class="timeline">
-              <div class="timeline-item">
-                <div class="hora">08:30 - 14:00</div>
-                <div class="columna-punto"><div class="punto"></div></div>
-                <div class="tarjeta-base">
-                  <div class="contenido-item">
-                    <h4>Libre de clases</h4>
-                    <p>Según horario U.S.</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Bloques inyectados dinámicamente -->
-              <div id="contenedor-plan" style="display: contents;"></div>
-
-              <div class="timeline-item">
-                <div class="hora">Tarde</div>
-                <div class="columna-punto"><div class="punto"></div></div>
-                <div class="tarjeta-base">
-                  <div class="contenido-item">
-                    <h4>Descanso / Tiempo Libre</h4>
-                  </div>
-                </div>
-              </div>
-
-              <div class="timeline-item">
-                <div class="hora">20:30 - 22:00</div>
-                <div class="columna-punto"><div class="punto punto-basket"></div></div>
-                <div class="tarjeta-basket">
-                  <div class="contenido-item">
-                    <h4>🏀 Entreno CD Colegio Claret</h4>
-                    <p>No olvides preparar la mochila.</p>
-                  </div>
-                </div>
-              </div>
+            <div class="timeline" id="contenedor-timeline-dia">
+              <!-- La línea de tiempo se genera de forma completamente dinámica e inteligente -->
             </div>
           </section>
 
@@ -590,7 +557,7 @@
       <section id="ajustes" class="vista-seccion">
         <h2 class="titulo-seccion">Ajustes del Sistema</h2>
         <div class="tarjeta-modulo">
-          <p>Configuración general. El sistema calcula las horas libres de forma inteligente de manera automática.</p>
+          <p>Configuración general. El sistema calcula los bloques horarios y las clases de forma totalmente autónoma.</p>
         </div>
       </section>
     </main>
@@ -714,32 +681,65 @@
       setInterval(actualizar, 1000);
     }
 
-    // Motor de cálculo autónomo basado en las horas libres reales del día
+    // Motor inteligente que construye la línea de tiempo adaptada al día actual
     async function cargarPanelHoy() {
-      // Definimos autónomamente el tiempo libre disponible del día (por ejemplo, 180 minutos de tarde libre óptima)
-      const minutosDisponibles = 180; 
+      const minutosDisponiblesTotales = 180; // Minutos óptimos de estudio para la tarde
       
-      const hoyStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+      const ahora = new Date();
+      const diaSemana = ahora.getDay(); // 0 = Domingo, 6 = Sábado
+      const esFinDeSemana = (diaSemana === 0 || diaSemana === 6);
+
+      const hoyStr = ahora.toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
       const fechaHoy = new Date(hoyStr + 'T00:00:00');
 
       const { data: asignaturas, error } = await supabaseClient
         .from('asignaturas')
         .select('*');
 
-      const contenedor = document.getElementById('contenedor-plan');
-      contenedor.innerHTML = ""; 
+      const contenedorTimeline = document.getElementById('contenedor-timeline-dia');
+      contenedorTimeline.innerHTML = ""; 
 
       if (error) {
         console.error("Error detallado Supabase:", error);
-        contenedor.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Error de conexión: ${error.message}</p></div>`;
+        contenedorTimeline.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Error de conexión: ${error.message}</p></div>`;
         return;
+      }
+
+      // 1. Bloque Mañana (Dinámico según si hay clases US o fin de semana)
+      if (!esFinDeSemana) {
+        contenedorTimeline.innerHTML += `
+          <div class="timeline-item">
+            <div class="hora">08:30 - 14:00</div>
+            <div class="columna-punto"><div class="punto"></div></div>
+            <div class="tarjeta-base">
+              <div class="contenido-item">
+                <h4>Clases lectivas US</h4>
+                <p>Jornada académica matutina</p>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        contenedorTimeline.innerHTML += `
+          <div class="timeline-item">
+            <div class="hora">Mañana</div>
+            <div class="columna-punto"><div class="punto"></div></div>
+            <div class="tarjeta-base">
+              <div class="contenido-item">
+                <h4>Fin de semana / Libre</h4>
+                <p>Sin clases matutinas US</p>
+              </div>
+            </div>
+          </div>
+        `;
       }
 
       if (!asignaturas || asignaturas.length === 0) {
-        contenedor.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Sin asignaturas registradas en la nube.</p></div>`;
+        contenedorTimeline.innerHTML += `<div class="tarjeta-base"><p style="color:red;">Sin asignaturas registradas en la nube.</p></div>`;
         return;
       }
 
+      // 2. Cálculo matemático de bloques de estudio con Supabase
       let asignaturasConUrgencia = [];
       let urgenciaTotal = 0;
 
@@ -748,7 +748,6 @@
         const diferenciaTiempo = fechaExamen - fechaHoy;
         const diasRestantes = Math.max(1, Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24))); 
         
-        // Ponderación inteligente: (Temas * Dificultad) / Días restantes
         const puntosCarga = asig.temas * asig.dificultad;
         const urgencia = puntosCarga / diasRestantes;
         
@@ -758,7 +757,7 @@
 
       let planDeHoy = [];
 
-      asignaturasConUrgencia.forEach(asig => {
+      asignaturasConUrgencia.sync = asignaturasConUrgencia.forEach(asig => {
         let porcentaje = asig.urgencia / urgenciaTotal;
         let minutosAsignados = minutosDisponibles * porcentaje;
 
@@ -768,7 +767,8 @@
         }
       });
 
-      let horaActualMinutos = 16 * 60; // Franja de tarde automática (16:00)
+      // Hora de inicio de tarde (16:00 o después de clases)
+      let horaActualMinutos = esFinDeSemana ? (10 * 60) : (16 * 60);
 
       planDeHoy.forEach((plan) => {
         const inicioH = Math.floor(horaActualMinutos / 60);
@@ -786,23 +786,47 @@
         const mins = plan.minutos % 60;
         const textoTiempo = horas > 0 ? `${horas}h ${mins > 0 ? mins + 'm' : ''}` : `${mins}m`;
 
-        const itemTimeline = document.createElement('div');
-        itemTimeline.className = 'timeline-item';
-        
-        itemTimeline.innerHTML = `
-          <div class="hora">${rangoHorario}</div>
-          <div class="columna-punto"><div class="punto punto-estudio"></div></div>
-          <div class="tarjeta-estudio">
-            <div class="contenido-item">
-              <h4>${plan.nombre}</h4>
-              <p>Tiempo objetivo: ${textoTiempo}</p>
+        contenedorTimeline.innerHTML += `
+          <div class="timeline-item">
+            <div class="hora">${rangoHorario}</div>
+            <div class="columna-punto"><div class="punto punto-estudio"></div></div>
+            <div class="tarjeta-estudio">
+              <div class="contenido-item">
+                <h4>${plan.nombre}</h4>
+                <p>Tiempo objetivo: ${textoTiempo}</p>
+              </div>
+              <button class="btn-check"></button>
             </div>
-            <button class="btn-check"></button>
           </div>
         `;
-        
-        contenedor.appendChild(itemTimeline);
       });
+
+      // 3. Bloques de tarde / descanso / baloncesto inteligentes según el día
+      contenedorTimeline.innerHTML += `
+        <div class="timeline-item">
+          <div class="hora">Tarde</div>
+          <div class="columna-punto"><div class="punto"></div></div>
+          <div class="tarjeta-base">
+            <div class="contenido-item">
+              <h4>Descanso / Tiempo Libre</h4>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Si es un día con entreno fijo (ej: martes, jueves, viernes, etc.)
+      contenedorTimeline.innerHTML += `
+        <div class="timeline-item">
+          <div class="hora">20:30 - 22:00</div>
+          <div class="columna-punto"><div class="punto punto-basket"></div></div>
+          <div class="tarjeta-basket">
+            <div class="contenido-item">
+              <h4>🏀 Entreno CD Colegio Claret</h4>
+              <p>No olvides preparar la mochila.</p>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     async function cargarAsignaturasCRUD() {
