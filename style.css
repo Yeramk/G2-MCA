@@ -1,4 +1,4 @@
-j:root {
+:root {
   --fondo: #f4f5f7;
   --blanco: #ffffff;
   --texto-principal: #1c1c1e;
@@ -14,7 +14,6 @@ j:root {
 
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--fondo); color: var(--texto-principal); margin: 0; display: flex; height: 100vh; }
 
-/* Sidebar */
 .dashboard { display: flex; width: 100%; max-width: 1200px; margin: 0 auto; background-color: var(--fondo);}
 .sidebar { width: 220px; background-color: var(--blanco); border-right: 1px solid var(--gris-linea); padding: 30px 20px; display: none; }
 .logo { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 18px; margin-bottom: 40px; }
@@ -28,21 +27,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 h1 { margin: 0; font-size: 28px; font-weight: bold;}
 .fecha { color: var(--texto-gris); margin-top: 5px; }
 
-/* Banner */
 .alerta-inteligente { background-color: var(--rosa-suave); border-left: 4px solid var(--rosa-pastel); padding: 16px 20px; border-radius: 12px; display: flex; gap: 15px; margin-bottom: 30px; box-shadow: var(--sombra); }
 .icono-alerta { font-size: 24px; }
 .texto-alerta { font-size: 14px; line-height: 1.5; color: #4a232b;}
 
-/* Grid */
 .grid-dashboard { display: grid; grid-template-columns: 1fr; gap: 30px; }
 @media (min-width: 900px) { .sidebar { display: block; } .grid-dashboard { grid-template-columns: 1.5fr 1fr; } }
 .titulo-seccion { font-size: 18px; margin-bottom: 20px; }
 
-/* Timeline Visual - CORREGIDO */
-.timeline { position: relative; padding-left: 95px; margin-left: 5px; }
-.timeline::before { content: ''; position: absolute; left: 79px; top: 10px; bottom: 10px; width: 2px; background-color: var(--gris-linea); }
+/* Timeline con espacio ensanchado para que la hora encaje bien */
+.timeline { position: relative; padding-left: 110px; margin-left: 10px; }
+.timeline::before { content: ''; position: absolute; left: 94px; top: 10px; bottom: 10px; width: 2px; background-color: var(--gris-linea); }
 .timeline-item { position: relative; margin-bottom: 30px; }
-.hora { position: absolute; left: -100px; top: 15px; width: 85px; text-align: right; font-size: 13px; color: var(--texto-gris); font-weight: 500; word-wrap: break-word;}
+.hora { position: absolute; left: -115px; top: 15px; width: 100px; text-align: right; font-size: 13px; color: var(--texto-gris); font-weight: 600; }
 .punto { position: absolute; left: -22px; top: 15px; width: 12px; height: 12px; border-radius: 50%; background-color: var(--gris-linea); border: 3px solid var(--fondo); z-index: 2;}
 
 .punto-estudio { background-color: var(--rosa-pastel); }
@@ -51,7 +48,6 @@ h1 { margin: 0; font-size: 28px; font-weight: bold;}
 .contenido-item h4 { margin: 0 0 5px 0; font-size: 15px; color: var(--texto-gris); }
 .contenido-item p { margin: 0; font-size: 13px; color: var(--texto-gris); }
 
-/* Tarjetas generadas */
 .tarjeta-estudio, .tarjeta-basket { background-color: var(--blanco); padding: 15px 20px; border-radius: 16px; box-shadow: var(--sombra); display: flex; justify-content: space-between; align-items: center; }
 .tarjeta-estudio { border-left: 4px solid var(--rosa-pastel); }
 .tarjeta-basket { border-left: 4px solid var(--naranja-basket); }
@@ -59,7 +55,6 @@ h1 { margin: 0; font-size: 28px; font-weight: bold;}
 .info-estudio p { margin-top: 4px !important; }
 .btn-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--rosa-pastel); background: transparent; cursor: pointer; }
 
-/* Derecha Contexto */
 .tarjeta-modulo { background-color: var(--blanco); border-radius: 16px; padding: 25px; box-shadow: var(--sombra); margin-bottom: 25px; }
 .titulo-modulo { margin: 0 0 20px 0; font-size: 16px; }
 .lista-eventos { list-style: none; padding: 0; margin: 0; }
