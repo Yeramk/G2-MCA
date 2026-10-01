@@ -17,6 +17,7 @@
       --rojo-alerta: #ff3b30;
       --gris-linea: #e5e5ea;
       --sombra: 0 10px 20px rgba(0,0,0,0.05);
+      --sombra-modal: 0 20px 40px rgba(0,0,0,0.2);
     }
 
     body {
@@ -35,7 +36,7 @@
       height: 100vh;
     }
 
-    /* BARRA LATERAL FIJA Y VISIBLE */
+    /* BARRA LATERAL FIJA */
     .sidebar {
       width: 240px;
       background-color: var(--blanco);
@@ -145,7 +146,6 @@
       margin-bottom: 20px;
     }
 
-    /* GESTIÓN DE VISTAS (OCULTAS POR DEFECTO) */
     .vista-seccion {
       display: none;
     }
@@ -311,13 +311,14 @@
       margin-bottom: 5px;
       font-weight: 600;
     }
-    .form-group input {
+    .form-group input, .form-group select {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--gris-linea);
       border-radius: 8px;
       font-size: 14px;
       box-sizing: border-box;
+      background: #fff;
     }
     .btn-primario {
       background-color: var(--rosa-pastel);
@@ -332,6 +333,90 @@
     }
     .btn-primario:hover {
       opacity: 0.9;
+    }
+
+    /* ELEMENTOS DE LA LISTA CON INTERACCIÓN TIPO TARJETA */
+    .item-asignatura-card {
+      padding: 16px;
+      margin-bottom: 12px;
+      background: var(--fondo);
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      border: 1px solid transparent;
+    }
+    .item-asignatura-card:hover {
+      background: #fff;
+      border-color: var(--rosa-pastel);
+      box-shadow: var(--sombra);
+      transform: translateY(-2px);
+    }
+
+    /* MODAL FLOTANTE ESTILO NATIVO */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-overlay.activo {
+      display: flex;
+    }
+    .modal-container {
+      background: var(--blanco);
+      width: 90%;
+      max-width: 420px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: var(--sombra-modal);
+      box-sizing: border-box;
+      animation: escalarModal 0.2s ease;
+    }
+    @keyframes escalarModal {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-header h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .btn-cerrar-modal {
+      background: var(--fondo);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+      color: var(--texto-gris);
+    }
+    .btn-eliminar-modal {
+      background-color: var(--rosa-suave);
+      color: var(--rosa-pastel);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      margin-top: 10px;
     }
   </style>
 
@@ -370,7 +455,7 @@
         <div class="alerta-inteligente">
           <div class="icono-alerta">🧠</div>
           <div class="texto-alerta">
-            <strong>Ajuste automático:</strong> Sincronizado con Supabase. Plan de estudio optimizado para hoy.
+            <strong>Ajuste automático:</strong> Sincronizado con Supabase. Plan optimizado en tiempo real.
           </div>
         </div>
 
@@ -451,7 +536,7 @@
         <h2 class="titulo-seccion">Gestión de Asignaturas</h2>
         <div class="grid-dashboard">
           <div class="tarjeta-modulo">
-            <h3 class="titulo-modulo">Materias en la Nube</h3>
+            <h3 class="titulo-modulo">Tus Materias (Pulsa para editar)</h3>
             <div id="lista-asignaturas-crud">
               <p style="color: var(--texto-gris);">Cargando asignaturas...</p>
             </div>
@@ -468,14 +553,20 @@
                 <input type="number" id="temas-asig" placeholder="Ej: 5" required>
               </div>
               <div class="form-group">
-                <label>Dificultad (Ej: 1.5 o 2.0)</label>
-                <input type="number" step="0.1" id="dificultad-asig" placeholder="2.0" required>
+                <label>Dificultad (1 a 5)</label>
+                <select id="dificultad-asig" required>
+                  <option value="1">1 - Muy fácil</option>
+                  <option value="2">2 - Fácil</option>
+                  <option value="3" selected>3 - Normal</option>
+                  <option value="4">4 - Difícil</option>
+                  <option value="5">5 - Muy difícil</option>
+                </select>
               </div>
               <div class="form-group">
                 <label>Fecha de examen</label>
                 <input type="date" id="fecha-asig" required>
               </div>
-              <button type="submit" class="btn-primario">Guardar en Supabase</button>
+              <button type="submit" class="btn-primario">Añadir a Supabase</button>
             </form>
           </div>
         </div>
@@ -508,6 +599,43 @@
     </main>
   </div>
 
+  <!-- ================= MODAL FLOTANTE PARA EDITAR ================= -->
+  <div id="modal-editar" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Editar Asignatura</h3>
+        <button class="btn-cerrar-modal" onclick="cerrarModal()">×</button>
+      </div>
+      <form id="form-editar-asig">
+        <input type="hidden" id="modal-edit-id">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" id="modal-nombre" required>
+        </div>
+        <div class="form-group">
+          <label>Número de temas</label>
+          <input type="number" id="modal-temas" required>
+        </div>
+        <div class="form-group">
+          <label>Dificultad (1 a 5)</label>
+          <select id="modal-dificultad" required>
+            <option value="1">1 - Muy fácil</option>
+            <option value="2">2 - Fácil</option>
+            <option value="3">3 - Normal</option>
+            <option value="4">4 - Difícil</option>
+            <option value="5">5 - Muy difícil</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fecha de examen</label>
+          <input type="date" id="modal-fecha" required>
+        </div>
+        <button type="submit" class="btn-primario">Guardar Cambios</button>
+        <button type="button" class="btn-eliminar-modal" onclick="eliminarAsignaturaDesdeModal()">Eliminar Asignatura</button>
+      </form>
+    </div>
+  </div>
+
   <!-- LÓGICA Y CONEXIÓN -->
   <script>
     const SUPABASE_URL = 'https://ttzqgnrrjpgoadlylmwq.supabase.co';
@@ -531,7 +659,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
       await cargarPanelHoy();
 
-      // Formulario de creación
+      // Formulario para añadir nueva asignatura
       const formAsig = document.getElementById('form-nueva-asig');
       formAsig.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -549,6 +677,30 @@
         } else {
           alert('¡Asignatura guardada con éxito!');
           formAsig.reset();
+          cargarAsignaturasCRUD();
+          cargarPanelHoy();
+        }
+      });
+
+      // Formulario dentro del Modal para editar asignatura
+      const formEditar = document.getElementById('form-editar-asig');
+      formEditar.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('modal-edit-id').value;
+        const nombre = document.getElementById('modal-nombre').value;
+        const temas = parseInt(document.getElementById('modal-temas').value);
+        const dificultad = parseFloat(document.getElementById('modal-dificultad').value);
+        const fecha_examen = document.getElementById('modal-fecha').value;
+
+        const { error } = await supabaseClient
+          .from('asignaturas')
+          .update({ nombre, temas, dificultad, fecha_examen })
+          .eq('id', id);
+
+        if (error) {
+          alert('Error al actualizar: ' + error.message);
+        } else {
+          cerrarModal();
           cargarAsignaturasCRUD();
           cargarPanelHoy();
         }
@@ -626,7 +778,7 @@
       });
     }
 
-    // Cargar listado en la vista de Asignaturas
+    // Cargar listado en la vista de Asignaturas como tarjetas interactivas
     async function cargarAsignaturasCRUD() {
       const contenedorCrud = document.getElementById('lista-asignaturas-crud');
       contenedorCrud.innerHTML = "<p style='color: var(--texto-gris);'>Cargando...</p>";
@@ -640,18 +792,58 @@
         return;
       }
 
+      if (asignaturas.length === 0) {
+        contenedorCrud.innerHTML = "<p style='color: var(--texto-gris);'>No hay asignaturas registradas.</p>";
+        return;
+      }
+
       contenedorCrud.innerHTML = "";
       asignaturas.forEach(asig => {
         const div = document.createElement('div');
-        div.style.cssText = "padding: 12px; margin-bottom: 10px; background: var(--fondo); border-radius: 10px; display: flex; justify-content: space-between; align-items: center;";
+        div.className = 'item-asignatura-card';
+        div.onclick = () => abrirModal(asig);
         div.innerHTML = `
           <div>
-            <strong>${asig.nombre}</strong><br>
-            <span style="font-size: 12px; color: var(--texto-gris);">Temas: ${asig.temas} | Dificultad: ${asig.dificultad} | Examen: ${asig.fecha_examen}</span>
+            <strong style="font-size: 15px;">${asig.nombre}</strong><br>
+            <span style="font-size: 13px; color: var(--texto-gris);">Temas: ${asig.temas} • Dificultad: ${asig.dificultad}/5 • Examen: ${asig.fecha_examen}</span>
           </div>
+          <span style="color: var(--rosa-pastel); font-weight: 600; font-size: 13px;">Editar ✏️</span>
         `;
         contenedorCrud.appendChild(div);
       });
+    }
+
+    // Funciones del Modal Flotante
+    function abrirModal(asig) {
+      document.getElementById('modal-edit-id').value = asig.id;
+      document.getElementById('modal-nombre').value = asig.nombre;
+      document.getElementById('modal-temas').value = asig.temas;
+      document.getElementById('modal-dificultad').value = asig.dificultad;
+      document.getElementById('modal-fecha').value = asig.fecha_examen;
+
+      document.getElementById('modal-editar').classList.add('activo');
+    }
+
+    function cerrarModal() {
+      document.getElementById('modal-editar').classList.remove('activo');
+    }
+
+    async function eliminarAsignaturaDesdeModal() {
+      const id = document.getElementById('modal-edit-id').value;
+      if (confirm('¿Seguro que quieres eliminar esta asignatura?')) {
+        const { error } = await supabaseClient
+          .from('asignaturas')
+          .delete()
+          .eq('id', id);
+
+        if (error) {
+          alert('Error al eliminar: ' + error.message);
+        } else {
+          cerrarModal();
+          cargarAsignaturasCRUD();
+          cargarPanelHoy();
+        }
+      }
     }
   </script>
 </body>
