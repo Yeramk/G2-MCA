@@ -139,7 +139,6 @@
       margin-bottom: 20px;
     }
 
-    /* NUEVA LÍNEA DE TIEMPO CON CSS GRID (IMPOSIBLE QUE SE CORTE) */
     .timeline {
       position: relative;
       display: flex;
@@ -147,7 +146,6 @@
       gap: 20px;
     }
 
-    /* Línea vertical continua que atraviesa los puntos */
     .timeline::before {
       content: '';
       position: absolute;
@@ -162,7 +160,7 @@
     .timeline-item {
       position: relative;
       display: grid;
-      grid-template-columns: 90px 32px 1fr; /* Columna de hora, columna del punto, contenido */
+      grid-template-columns: 90px 32px 1fr;
       align-items: center;
     }
 
@@ -230,7 +228,6 @@
       cursor: pointer;
     }
 
-    /* Columna derecha */
     .tarjeta-modulo {
       background-color: var(--blanco);
       border-radius: 16px;
@@ -288,6 +285,9 @@
       color: var(--texto-gris);
     }
   </style>
+
+  <!-- Cargamos la librería oficial de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="dashboard">
@@ -319,7 +319,7 @@
       <div class="alerta-inteligente">
         <div class="icono-alerta">🧠</div>
         <div class="texto-alerta">
-          <strong>Ajuste automático:</strong> Hoy no tienes clases presenciales. He concentrado el estudio para dejarte la tarde libre antes de tu entreno (20:30).
+          <strong>Ajuste automático:</strong> Sincronizado correctamente con Supabase. Leyendo asignaturas y calculando prioridades en tiempo real.
         </div>
       </div>
 
@@ -342,7 +342,7 @@
               </div>
             </div>
 
-            <!-- AQUÍ EL JAVASCRIPT INYECTARÁ LOS CÁLCULOS CON SUS HORAS -->
+            <!-- AQUÍ EL JAVASCRIPT CONECTADO A SUPABASE INYECTARÁ LOS CÁLCULOS -->
             <div id="contenedor-plan" style="display: contents;"></div>
 
             <!-- Bloque Tarde -->
@@ -404,28 +404,43 @@
     </main>
   </div>
 
-  <!-- CEREBRO MATEMÁTICO INTEGRADO -->
+  <!-- CONEXIÓN CON SUPABASE Y CEREBRO MATEMÁTICO -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    const SUPABASE_URL = 'https://ttzqgnrrjpgoadlylmwq.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    document.addEventListener("DOMContentLoaded", async () => {
       const minutosDisponibles = 180; 
       const fechaHoy = new Date('2026-10-01');
 
-      const asignaturas = [
-        { nombre: 'CED', temas: 6, dificultad: 2.0, fechaExamen: new Date('2026-10-21') }, 
-        { nombre: 'ADE', temas: 4, dificultad: 1.5, fechaExamen: new Date('2026-10-23') }, 
-        { nombre: 'FP', temas: 7, dificultad: 2.0, fechaExamen: new Date('2026-10-26') }   
-      ];
+      // 1. OBTENER LOS DATOS DESDE LA NUBE (SUPABASE)
+      const { data: asignaturas, error } = await supabaseClient
+        .from('asignaturas')
+        .select('*');
 
+      const contenedor = document.getElementById('contenedor-plan');
+      contenedor.innerHTML = ""; 
+
+      if (error || !asignaturas || asignaturas.length === 0) {
+        contenedor.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Error al conectar con Supabase: ${error ? error.message : 'Sin datos'}</p></div>`;
+        return;
+      }
+
+      // 2. EL CÁLCULO MATEMÁTICO CON LOS DATOS DE LA NUBE
       let asignaturasConUrgencia = [];
       let urgenciaTotal = 0;
 
       asignaturas.forEach(asig => {
-        const diferenciaTiempo = asig.fechaExamen - fechaHoy;
+        const fechaExamen = new Date(asig.fecha_examen);
+        const diferenciaTiempo = fechaExamen - fechaHoy;
         const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24)); 
+        
         const puntosCarga = asig.temas * asig.dificultad;
         const urgencia = puntosCarga / diasRestantes;
         
-        asignaturasConUrgencia.push({ ...asig, diasRestantes, urgencia });
+        asignaturasConUrgencia.push({ nombre: asig.nombre, urgencia });
         urgenciaTotal += urgencia;
       });
 
@@ -441,9 +456,7 @@
         }
       });
 
-      const contenedor = document.getElementById('contenedor-plan');
-      contenedor.innerHTML = ""; 
-
+      // 3. PINTAR EL RESULTADO EN LA LÍNEA DE TIEMPO
       const franjasHorarias = ["10:00 - 11:30", "11:30 - 13:00", "13:00 - 14:00"];
 
       planDeHoy.forEach((plan, index) => {
