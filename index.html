@@ -116,7 +116,6 @@
       text-transform: capitalize;
     }
 
-    /* Reloj digital en vivo */
     .reloj-vivo {
       background: var(--blanco);
       padding: 10px 18px;
@@ -462,7 +461,7 @@
         <div class="alerta-inteligente">
           <div class="icono-alerta">🧠</div>
           <div class="texto-alerta">
-            <strong>Planificador en tiempo real:</strong> Sincronizado automáticamente con la hora española y Supabase.
+            <strong>Planificador en tiempo real:</strong> Sincronizado con Supabase y ajustado a tus minutos diarios configurados.
           </div>
         </div>
 
@@ -589,8 +588,20 @@
       </section>
 
       <section id="ajustes" class="vista-seccion">
-        <h2 class="titulo-seccion">Ajustes</h2>
-        <div class="tarjeta-modulo"><p>Preferencias del sistema.</p></div>
+        <h2 class="titulo-seccion">Ajustes del Sistema</h2>
+        <div class="grid-dashboard">
+          <div class="tarjeta-modulo" style="grid-column: span 2; max-width: 500px;">
+            <h3 class="titulo-modulo">Preferencias de Estudio</h3>
+            <form id="form-ajustes">
+              <div class="form-group">
+                <label>Minutos de estudio diarios disponibles</label>
+                <input type="number" id="input-minutos-estudio" step="15" min="30" max="480" required>
+                <span style="font-size: 12px; color: var(--texto-gris); margin-top: 5px; display: block;">Por defecto son 180 min (3 horas). El motor recalculará las franjas horarias con este valor.</span>
+              </div>
+              <button type="submit" class="btn-primario">Guardar Ajustes</button>
+            </form>
+          </div>
+        </div>
       </section>
     </main>
   </div>
@@ -634,7 +645,7 @@
 
   <script>
     const SUPABASE_URL = 'https://ttzqgnrrjpgoadlylmwq.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6InFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -647,15 +658,16 @@
 
       if (idSeccion === 'asignaturas') {
         cargarAsignaturasCRUD();
+      } else if (idSeccion === 'ajustes') {
+        cargarConfiguracionAjustes();
       }
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // Iniciar Reloj y Fecha en tiempo real (Zona horaria España)
       iniciarRelojYFecha();
-
       await cargarPanelHoy();
 
+      // Formulario de añadir nueva asignatura
       const formAsig = document.getElementById('form-nueva-asig');
       formAsig.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -678,6 +690,7 @@
         }
       });
 
+      // Formulario del modal de edición
       const formEditar = document.getElementById('form-editar-asig');
       formEditar.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -700,32 +713,45 @@
           cargarPanelHoy();
         }
       });
+
+      // Formulario de Ajustes
+      const formAjustes = document.getElementById('form-ajustes');
+      formAjustes.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const minutos = parseInt(document.getElementById('input-minutos-estudio').value);
+        if (minutos && minutos > 0) {
+          localStorage.setItem('minutosDisponibles', minutos);
+          alert('¡Ajustes guardados correctamente! El plan de estudio se ha recalculado.');
+          cargarPanelHoy();
+          cambiarSeccion('panel-hoy', document.querySelector('.menu-items li'));
+        }
+      });
     });
 
-    // Función que gestiona la fecha y el reloj en vivo adaptado a España
     function iniciarRelojYFecha() {
       const actualizar = () => {
         const ahora = new Date();
-        
-        // Formato de fecha legible en español
         const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Madrid' };
         document.getElementById('texto-fecha').innerText = ahora.toLocaleDateString('es-ES', opcionesFecha);
 
-        // Hora en formato digital
         const opcionesHora = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Europe/Madrid', hour12: false };
         document.getElementById('reloj-digital').innerText = ahora.toLocaleTimeString('es-ES', opcionesHora);
       };
-
       actualizar();
-      setInterval(actualizar, 1000); // Se actualiza cada segundo
+      setInterval(actualizar, 1000);
     }
 
-    // Motor de cálculo basado en el día real de hoy
+    function cargarConfiguracionAjustes() {
+      const minutosActuales = localStorage.getItem('minutosDisponibles') || 180;
+      document.getElementById('input-minutos-estudio').value = minutosActuales;
+    }
+
+    // Motor de cálculo basado en tiempo real y minutos configurados
     async function cargarPanelHoy() {
-      const minutosDisponibles = 180; 
+      // Obtenemos los minutos configurados (por defecto 180 si no se ha cambiado)
+      const minutosDisponibles = parseInt(localStorage.getItem('minutosDisponibles')) || 180; 
       
-      // Obtenemos estrictamente la fecha de hoy a medianoche en hora local
-      const hoyStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' }); // Formato YYYY-MM-DD
+      const hoyStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
       const fechaHoy = new Date(hoyStr + 'T00:00:00');
 
       const { data: asignaturas, error } = await supabaseClient
@@ -754,7 +780,6 @@
         const diferenciaTiempo = fechaExamen - fechaHoy;
         const diasRestantes = Math.max(1, Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24))); 
         
-        // Ponderación: Temas * Dificultad (1 a 5) / Días restantes
         const puntosCarga = asig.temas * asig.dificultad;
         const urgencia = puntosCarga / diasRestantes;
         
