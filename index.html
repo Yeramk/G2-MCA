@@ -36,7 +36,6 @@
       height: 100vh;
     }
 
-    /* BARRA LATERAL FIJA */
     .sidebar {
       width: 240px;
       background-color: var(--blanco);
@@ -91,7 +90,6 @@
       font-weight: 600;
     }
 
-    /* CONTENIDO PRINCIPAL */
     .contenido-principal {
       flex: 1;
       padding: 40px;
@@ -153,7 +151,6 @@
       display: block;
     }
 
-    /* LÍNEA DE TIEMPO */
     .timeline {
       position: relative;
       display: flex;
@@ -243,7 +240,6 @@
       cursor: pointer;
     }
 
-    /* MÓDULOS Y FORMULARIOS */
     .tarjeta-modulo {
       background-color: var(--blanco);
       border-radius: 16px;
@@ -335,7 +331,6 @@
       opacity: 0.9;
     }
 
-    /* ELEMENTOS DE LA LISTA CON INTERACCIÓN TIPO TARJETA */
     .item-asignatura-card {
       padding: 16px;
       margin-bottom: 12px;
@@ -355,7 +350,6 @@
       transform: translateY(-2px);
     }
 
-    /* MODAL FLOTANTE ESTILO NATIVO */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -425,8 +419,6 @@
 </head>
 <body>
   <div class="dashboard">
-    
-    <!-- BARRA LATERAL FIJA -->
     <nav class="sidebar">
       <div class="logo">
         <div class="logo-circulo"></div>
@@ -441,7 +433,6 @@
       </ul>
     </nav>
 
-    <!-- CONTENEDOR DE PANTALLAS -->
     <main class="contenido-principal">
       <header class="cabecera">
         <div>
@@ -450,12 +441,11 @@
         </div>
       </header>
 
-      <!-- ================= VISTA 1: PANEL DE HOY ================= -->
       <section id="panel-hoy" class="vista-seccion activa">
         <div class="alerta-inteligente">
           <div class="icono-alerta">🧠</div>
           <div class="texto-alerta">
-            <strong>Ajuste automático:</strong> Sincronizado con Supabase. Plan optimizado en tiempo real.
+            <strong>Ajuste automático:</strong> Sincronizado con Supabase. Plan optimizado ponderando temas y dificultad.
           </div>
         </div>
 
@@ -474,7 +464,6 @@
                 </div>
               </div>
 
-              <!-- Bloques inyectados dinámicamente -->
               <div id="contenedor-plan" style="display: contents;"></div>
 
               <div class="timeline-item">
@@ -531,7 +520,6 @@
         </div>
       </section>
 
-      <!-- ================= VISTA 2: ASIGNATURAS ================= -->
       <section id="asignaturas" class="vista-seccion">
         <h2 class="titulo-seccion">Gestión de Asignaturas</h2>
         <div class="grid-dashboard">
@@ -572,34 +560,24 @@
         </div>
       </section>
 
-      <!-- ================= VISTA 3: CALENDARIO ================= -->
       <section id="calendario" class="vista-seccion">
         <h2 class="titulo-seccion">Calendario</h2>
-        <div class="tarjeta-modulo">
-          <p>Próximamente: Vista completa de exámenes y eventos destacados.</p>
-        </div>
+        <div class="tarjeta-modulo"><p>Próximamente...</p></div>
       </section>
 
-      <!-- ================= VISTA 4: BALONCESTO ================= -->
       <section id="baloncesto" class="vista-seccion">
         <h2 class="titulo-seccion">Baloncesto</h2>
-        <div class="tarjeta-modulo">
-          <p>Control de entrenamientos, partidos y organización arbitral.</p>
-        </div>
+        <div class="tarjeta-modulo"><p>Control de entrenamientos y partidos.</p></div>
       </section>
 
-      <!-- ================= VISTA 5: AJUSTES ================= -->
       <section id="ajustes" class="vista-seccion">
         <h2 class="titulo-seccion">Ajustes</h2>
-        <div class="tarjeta-modulo">
-          <p>Configuración general de horas de estudio y preferencias del sistema.</p>
-        </div>
+        <div class="tarjeta-modulo"><p>Preferencias del sistema.</p></div>
       </section>
-
     </main>
   </div>
 
-  <!-- ================= MODAL FLOTANTE PARA EDITAR ================= -->
+  <!-- MODAL DE EDICIÓN -->
   <div id="modal-editar" class="modal-overlay">
     <div class="modal-container">
       <div class="modal-header">
@@ -636,14 +614,12 @@
     </div>
   </div>
 
-  <!-- LÓGICA Y CONEXIÓN -->
   <script>
     const SUPABASE_URL = 'https://ttzqgnrrjpgoadlylmwq.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Cambio de pestañas
     function cambiarSeccion(idSeccion, elementoLi) {
       document.querySelectorAll('.vista-seccion').forEach(sec => sec.classList.remove('activa'));
       document.querySelectorAll('.menu-items li').forEach(li => li.classList.remove('active'));
@@ -659,13 +635,12 @@
     document.addEventListener("DOMContentLoaded", async () => {
       await cargarPanelHoy();
 
-      // Formulario para añadir nueva asignatura
       const formAsig = document.getElementById('form-nueva-asig');
       formAsig.addEventListener('submit', async (e) => {
         e.preventDefault();
         const nombre = document.getElementById('nombre-asig').value;
         const temas = parseInt(document.getElementById('temas-asig').value);
-        const dificultad = parseFloat(document.getElementById('dificultad-asig').value);
+        const dificultad = parseInt(document.getElementById('dificultad-asig').value);
         const fecha_examen = document.getElementById('fecha-asig').value;
 
         const { error } = await supabaseClient
@@ -682,14 +657,13 @@
         }
       });
 
-      // Formulario dentro del Modal para editar asignatura
       const formEditar = document.getElementById('form-editar-asig');
       formEditar.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('modal-edit-id').value;
         const nombre = document.getElementById('modal-nombre').value;
         const temas = parseInt(document.getElementById('modal-temas').value);
-        const dificultad = parseFloat(document.getElementById('modal-dificultad').value);
+        const dificultad = parseInt(document.getElementById('modal-dificultad').value);
         const fecha_examen = document.getElementById('modal-fecha').value;
 
         const { error } = await supabaseClient
@@ -707,7 +681,6 @@
       });
     });
 
-    // Cargar panel principal con cálculo dinámico
     async function cargarPanelHoy() {
       const minutosDisponibles = 180; 
       const fechaHoy = new Date('2026-10-01');
@@ -732,6 +705,7 @@
         const diferenciaTiempo = fechaExamen - fechaHoy;
         const diasRestantes = Math.max(1, Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24))); 
         
+        // Ponderación exacta teniendo en cuenta la carga de temas y la dificultad de 1 a 5
         const puntosCarga = asig.temas * asig.dificultad;
         const urgencia = puntosCarga / diasRestantes;
         
@@ -778,7 +752,6 @@
       });
     }
 
-    // Cargar listado en la vista de Asignaturas como tarjetas interactivas
     async function cargarAsignaturasCRUD() {
       const contenedorCrud = document.getElementById('lista-asignaturas-crud');
       contenedorCrud.innerHTML = "<p style='color: var(--texto-gris);'>Cargando...</p>";
@@ -813,7 +786,6 @@
       });
     }
 
-    // Funciones del Modal Flotante
     function abrirModal(asig) {
       document.getElementById('modal-edit-id').value = asig.id;
       document.getElementById('modal-nombre').value = asig.nombre;
