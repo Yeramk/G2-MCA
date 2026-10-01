@@ -139,67 +139,61 @@
       margin-bottom: 20px;
     }
 
-    /* LÍNEA DE TIEMPO PERFECTA */
+    /* NUEVA LÍNEA DE TIEMPO CON CSS GRID (IMPOSIBLE QUE SE CORTE) */
     .timeline {
       position: relative;
-      padding-left: 110px;
-      margin-left: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
+    /* Línea vertical continua que atraviesa los puntos */
     .timeline::before {
       content: '';
       position: absolute;
-      left: 94px;
+      left: 106px;
       top: 10px;
       bottom: 10px;
       width: 2px;
       background-color: var(--gris-linea);
+      z-index: 1;
     }
 
     .timeline-item {
       position: relative;
-      margin-bottom: 30px;
+      display: grid;
+      grid-template-columns: 90px 32px 1fr; /* Columna de hora, columna del punto, contenido */
+      align-items: center;
     }
 
     .hora {
-      position: absolute;
-      left: -115px;
-      top: 15px;
-      width: 100px;
       text-align: right;
-      font-size: 13px;
+      padding-right: 12px;
+      font-size: 12px;
       color: var(--texto-gris);
       font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .columna-punto {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
     }
 
     .punto {
-      position: absolute;
-      left: -22px;
-      top: 15px;
       width: 12px;
       height: 12px;
       border-radius: 50%;
       background-color: var(--gris-linea);
       border: 3px solid var(--fondo);
-      z-index: 2;
     }
 
     .punto-estudio { background-color: var(--rosa-pastel); }
     .punto-basket { background-color: var(--naranja-basket); }
 
-    .contenido-item h4 {
-      margin: 0 0 5px 0;
-      font-size: 15px;
-      color: var(--texto-gris);
-    }
-
-    .contenido-item p {
-      margin: 0;
-      font-size: 13px;
-      color: var(--texto-gris);
-    }
-
-    .tarjeta-estudio, .tarjeta-basket {
+    .tarjeta-estudio, .tarjeta-basket, .tarjeta-base {
       background-color: var(--blanco);
       padding: 15px 20px;
       border-radius: 16px;
@@ -207,19 +201,24 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .tarjeta-estudio { border-left: 4px solid var(--rosa-pastel); }
     .tarjeta-basket { border-left: 4px solid var(--naranja-basket); }
+    .tarjeta-base { border-left: 4px solid var(--gris-linea); }
 
-    .info-estudio h4 {
-      color: var(--texto-principal) !important;
-      font-size: 16px !important;
-      margin: 0;
+    .contenido-item h4 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+      color: var(--texto-principal);
     }
 
-    .info-estudio p {
-      margin-top: 4px !important;
+    .contenido-item p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--texto-gris);
     }
 
     .btn-check {
@@ -231,6 +230,7 @@
       cursor: pointer;
     }
 
+    /* Columna derecha */
     .tarjeta-modulo {
       background-color: var(--blanco);
       border-radius: 16px;
@@ -331,34 +331,40 @@
           
           <div class="timeline">
             <!-- Bloque U.S. (Estático) -->
-            <div class="timeline-item inactivo">
+            <div class="timeline-item">
               <div class="hora">08:30 - 14:00</div>
-              <div class="punto"></div>
-              <div class="contenido-item">
-                <h4>Libre de clases</h4>
-                <p>Según horario U.S.</p>
+              <div class="columna-punto"><div class="punto"></div></div>
+              <div class="tarjeta-base">
+                <div class="contenido-item">
+                  <h4>Libre de clases</h4>
+                  <p>Según horario U.S.</p>
+                </div>
               </div>
             </div>
 
             <!-- AQUÍ EL JAVASCRIPT INYECTARÁ LOS CÁLCULOS CON SUS HORAS -->
-            <div id="contenedor-plan"></div>
+            <div id="contenedor-plan" style="display: contents;"></div>
 
             <!-- Bloque Tarde -->
-            <div class="timeline-item inactivo">
+            <div class="timeline-item">
               <div class="hora">Tarde</div>
-              <div class="punto"></div>
-              <div class="contenido-item">
-                <h4>Descanso / Tiempo Libre</h4>
+              <div class="columna-punto"><div class="punto"></div></div>
+              <div class="tarjeta-base">
+                <div class="contenido-item">
+                  <h4>Descanso / Tiempo Libre</h4>
+                </div>
               </div>
             </div>
 
-            <!-- Bloque Baloncesto (Estático) -->
-            <div class="timeline-item especial">
+            <!-- Bloque Baloncesto -->
+            <div class="timeline-item">
               <div class="hora">20:30 - 22:00</div>
-              <div class="punto punto-basket"></div>
-              <div class="contenido-item tarjeta-basket">
-                <h4>🏀 Entreno CD Colegio Claret</h4>
-                <p>No olvides preparar la mochila.</p>
+              <div class="columna-punto"><div class="punto punto-basket"></div></div>
+              <div class="tarjeta-basket">
+                <div class="contenido-item">
+                  <h4>🏀 Entreno CD Colegio Claret</h4>
+                  <p>No olvides preparar la mochila.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -448,13 +454,13 @@
         const horaAsignada = franjasHorarias[index] || `Bloque ${index + 1}`;
 
         const itemTimeline = document.createElement('div');
-        itemTimeline.className = 'timeline-item activo';
+        itemTimeline.className = 'timeline-item';
         
         itemTimeline.innerHTML = `
           <div class="hora">${horaAsignada}</div>
-          <div class="punto punto-estudio"></div>
-          <div class="contenido-item tarjeta-estudio">
-            <div class="info-estudio">
+          <div class="columna-punto"><div class="punto punto-estudio"></div></div>
+          <div class="tarjeta-estudio">
+            <div class="contenido-item">
               <h4>${plan.nombre}</h4>
               <p>Tiempo objetivo: ${textoTiempo}</p>
             </div>
