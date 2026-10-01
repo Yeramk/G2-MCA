@@ -26,22 +26,24 @@
       margin: 0;
       display: flex;
       height: 100vh;
+      overflow: hidden;
     }
 
     .dashboard {
       display: flex;
       width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      background-color: var(--fondo);
+      height: 100vh;
     }
 
+    /* BARRA LATERAL FIJA Y VISIBLE */
     .sidebar {
-      width: 220px;
+      width: 240px;
       background-color: var(--blanco);
       border-right: 1px solid var(--gris-linea);
       padding: 30px 20px;
-      display: none;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
     }
 
     .logo {
@@ -68,11 +70,18 @@
 
     .menu-items li {
       padding: 12px 15px;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       border-radius: 10px;
       color: var(--texto-gris);
       cursor: pointer;
       font-size: 15px;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .menu-items li:hover {
+      background-color: var(--fondo);
+      color: var(--texto-principal);
     }
 
     .menu-items li.active {
@@ -81,10 +90,12 @@
       font-weight: 600;
     }
 
+    /* CONTENIDO PRINCIPAL */
     .contenido-principal {
       flex: 1;
-      padding: 30px;
+      padding: 40px;
       overflow-y: auto;
+      background-color: var(--fondo);
     }
 
     .cabecera {
@@ -125,13 +136,8 @@
 
     .grid-dashboard {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: 1.5fr 1fr;
       gap: 30px;
-    }
-
-    @media (min-width: 900px) {
-      .sidebar { display: block; }
-      .grid-dashboard { grid-template-columns: 1.5fr 1fr; }
     }
 
     .titulo-seccion {
@@ -139,6 +145,15 @@
       margin-bottom: 20px;
     }
 
+    /* GESTIÓN DE VISTAS (OCULTAS POR DEFECTO) */
+    .vista-seccion {
+      display: none;
+    }
+    .vista-seccion.activa {
+      display: block;
+    }
+
+    /* LÍNEA DE TIEMPO */
     .timeline {
       position: relative;
       display: flex;
@@ -228,6 +243,7 @@
       cursor: pointer;
     }
 
+    /* MÓDULOS Y FORMULARIOS */
     .tarjeta-modulo {
       background-color: var(--blanco);
       border-radius: 16px;
@@ -284,29 +300,63 @@
       font-size: 12px;
       color: var(--texto-gris);
     }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--texto-gris);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--gris-linea);
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .btn-primario {
+      background-color: var(--rosa-pastel);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+    }
+    .btn-primario:hover {
+      opacity: 0.9;
+    }
   </style>
 
-  <!-- Cargamos la librería oficial de Supabase -->
+  <!-- Librería Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="dashboard">
-    <!-- MENÚ LATERAL -->
+    
+    <!-- BARRA LATERAL FIJA -->
     <nav class="sidebar">
       <div class="logo">
         <div class="logo-circulo"></div>
         <span>Planificador</span>
       </div>
       <ul class="menu-items">
-        <li class="active">📊 Panel de Hoy</li>
-        <li>📅 Calendario</li>
-        <li>📚 Asignaturas</li>
-        <li>🏀 Baloncesto</li>
-        <li>⚙️ Ajustes</li>
+        <li class="active" onclick="cambiarSeccion('panel-hoy', this)">📊 Panel de Hoy</li>
+        <li onclick="cambiarSeccion('calendario', this)">📅 Calendario</li>
+        <li onclick="cambiarSeccion('asignaturas', this)">📚 Asignaturas</li>
+        <li onclick="cambiarSeccion('baloncesto', this)">🏀 Baloncesto</li>
+        <li onclick="cambiarSeccion('ajustes', this)">⚙️ Ajustes</li>
       </ul>
     </nav>
 
-    <!-- CONTENIDO PRINCIPAL -->
+    <!-- CONTENEDOR DE PANTALLAS -->
     <main class="contenido-principal">
       <header class="cabecera">
         <div>
@@ -315,107 +365,201 @@
         </div>
       </header>
 
-      <!-- BANNER INTELIGENTE -->
-      <div class="alerta-inteligente">
-        <div class="icono-alerta">🧠</div>
-        <div class="texto-alerta">
-          <strong>Ajuste automático:</strong> Sincronizado correctamente con Supabase. Leyendo asignaturas y calculando prioridades en tiempo real.
+      <!-- ================= VISTA 1: PANEL DE HOY ================= -->
+      <section id="panel-hoy" class="vista-seccion activa">
+        <div class="alerta-inteligente">
+          <div class="icono-alerta">🧠</div>
+          <div class="texto-alerta">
+            <strong>Ajuste automático:</strong> Sincronizado con Supabase. Plan de estudio optimizado para hoy.
+          </div>
         </div>
-      </div>
 
-      <div class="grid-dashboard">
-        
-        <!-- COLUMNA IZQUIERDA: LÍNEA DE TIEMPO -->
-        <section class="columna-timeline">
-          <h2 class="titulo-seccion">Tu día al detalle</h2>
-          
-          <div class="timeline">
-            <!-- Bloque U.S. (Estático) -->
-            <div class="timeline-item">
-              <div class="hora">08:30 - 14:00</div>
-              <div class="columna-punto"><div class="punto"></div></div>
-              <div class="tarjeta-base">
-                <div class="contenido-item">
-                  <h4>Libre de clases</h4>
-                  <p>Según horario U.S.</p>
+        <div class="grid-dashboard">
+          <section class="columna-timeline">
+            <h2 class="titulo-seccion">Tu día al detalle</h2>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="hora">08:30 - 14:00</div>
+                <div class="columna-punto"><div class="punto"></div></div>
+                <div class="tarjeta-base">
+                  <div class="contenido-item">
+                    <h4>Libre de clases</h4>
+                    <p>Según horario U.S.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bloques inyectados dinámicamente -->
+              <div id="contenedor-plan" style="display: contents;"></div>
+
+              <div class="timeline-item">
+                <div class="hora">Tarde</div>
+                <div class="columna-punto"><div class="punto"></div></div>
+                <div class="tarjeta-base">
+                  <div class="contenido-item">
+                    <h4>Descanso / Tiempo Libre</h4>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="hora">20:30 - 22:00</div>
+                <div class="columna-punto"><div class="punto punto-basket"></div></div>
+                <div class="tarjeta-basket">
+                  <div class="contenido-item">
+                    <h4>🏀 Entreno CD Colegio Claret</h4>
+                    <p>No olvides preparar la mochila.</p>
+                  </div>
                 </div>
               </div>
             </div>
+          </section>
 
-            <!-- AQUÍ EL JAVASCRIPT CONECTADO A SUPABASE INYECTARÁ LOS CÁLCULOS -->
-            <div id="contenedor-plan" style="display: contents;"></div>
-
-            <!-- Bloque Tarde -->
-            <div class="timeline-item">
-              <div class="hora">Tarde</div>
-              <div class="columna-punto"><div class="punto"></div></div>
-              <div class="tarjeta-base">
-                <div class="contenido-item">
-                  <h4>Descanso / Tiempo Libre</h4>
-                </div>
-              </div>
+          <section class="columna-contexto">
+            <div class="tarjeta-modulo">
+              <h3 class="titulo-modulo">Próximos eventos</h3>
+              <ul class="lista-eventos">
+                <li>
+                  <div class="fecha-etiqueta amarilla">3 Oct</div>
+                  <div class="info-evento">
+                    <strong>vs. CB Fresas (Local)</strong>
+                    <span>Pab. Colegio Claret • 17:00</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="fecha-etiqueta roja">21 Oct</div>
+                  <div class="info-evento">
+                    <strong>Examen: CED</strong>
+                    <span>Alta prioridad</span>
+                  </div>
+                </li>
+                <li>
+                  <div class="fecha-etiqueta naranja">23 Oct</div>
+                  <div class="info-evento">
+                    <strong>Examen: ADE</strong>
+                    <span>Prioridad media</span>
+                  </div>
+                </li>
+              </ul>
             </div>
+          </section>
+        </div>
+      </section>
 
-            <!-- Bloque Baloncesto -->
-            <div class="timeline-item">
-              <div class="hora">20:30 - 22:00</div>
-              <div class="columna-punto"><div class="punto punto-basket"></div></div>
-              <div class="tarjeta-basket">
-                <div class="contenido-item">
-                  <h4>🏀 Entreno CD Colegio Claret</h4>
-                  <p>No olvides preparar la mochila.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- COLUMNA DERECHA: CONTEXTO -->
-        <section class="columna-contexto">
+      <!-- ================= VISTA 2: ASIGNATURAS ================= -->
+      <section id="asignaturas" class="vista-seccion">
+        <h2 class="titulo-seccion">Gestión de Asignaturas</h2>
+        <div class="grid-dashboard">
           <div class="tarjeta-modulo">
-            <h3 class="titulo-modulo">Próximos eventos</h3>
-            <ul class="lista-eventos">
-              <li class="evento-basket">
-                <div class="fecha-etiqueta amarilla">3 Oct</div>
-                <div class="info-evento">
-                  <strong>vs. CB Fresas (Local)</strong>
-                  <span>Pab. Colegio Claret • 17:00</span>
-                </div>
-              </li>
-              <li class="evento-examen">
-                <div class="fecha-etiqueta roja">21 Oct</div>
-                <div class="info-evento">
-                  <strong>Examen: CED</strong>
-                  <span>Alta prioridad</span>
-                </div>
-              </li>
-              <li class="evento-personal">
-                <div class="fecha-etiqueta naranja">23 Oct</div>
-                <div class="info-evento">
-                  <strong>Examen: ADE</strong>
-                  <span>Prioridad media</span>
-                </div>
-              </li>
-            </ul>
+            <h3 class="titulo-modulo">Materias en la Nube</h3>
+            <div id="lista-asignaturas-crud">
+              <p style="color: var(--texto-gris);">Cargando asignaturas...</p>
+            </div>
           </div>
-        </section>
+          <div class="tarjeta-modulo">
+            <h3 class="titulo-modulo">Añadir nueva asignatura</h3>
+            <form id="form-nueva-asig">
+              <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="nombre-asig" placeholder="Ej: ALN" required>
+              </div>
+              <div class="form-group">
+                <label>Número de temas</label>
+                <input type="number" id="temas-asig" placeholder="Ej: 5" required>
+              </div>
+              <div class="form-group">
+                <label>Dificultad (Ej: 1.5 o 2.0)</label>
+                <input type="number" step="0.1" id="dificultad-asig" placeholder="2.0" required>
+              </div>
+              <div class="form-group">
+                <label>Fecha de examen</label>
+                <input type="date" id="fecha-asig" required>
+              </div>
+              <button type="submit" class="btn-primario">Guardar en Supabase</button>
+            </form>
+          </div>
+        </div>
+      </section>
 
-      </div>
+      <!-- ================= VISTA 3: CALENDARIO ================= -->
+      <section id="calendario" class="vista-seccion">
+        <h2 class="titulo-seccion">Calendario</h2>
+        <div class="tarjeta-modulo">
+          <p>Próximamente: Vista completa de exámenes y eventos destacados.</p>
+        </div>
+      </section>
+
+      <!-- ================= VISTA 4: BALONCESTO ================= -->
+      <section id="baloncesto" class="vista-seccion">
+        <h2 class="titulo-seccion">Baloncesto</h2>
+        <div class="tarjeta-modulo">
+          <p>Control de entrenamientos, partidos y organización arbitral.</p>
+        </div>
+      </section>
+
+      <!-- ================= VISTA 5: AJUSTES ================= -->
+      <section id="ajustes" class="vista-seccion">
+        <h2 class="titulo-seccion">Ajustes</h2>
+        <div class="tarjeta-modulo">
+          <p>Configuración general de horas de estudio y preferencias del sistema.</p>
+        </div>
+      </section>
+
     </main>
   </div>
 
-  <!-- CONEXIÓN CON SUPABASE Y CEREBRO MATEMÁTICO -->
+  <!-- LÓGICA Y CONEXIÓN -->
   <script>
     const SUPABASE_URL = 'https://ttzqgnrrjpgoadlylmwq.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // Cambio de pestañas
+    function cambiarSeccion(idSeccion, elementoLi) {
+      document.querySelectorAll('.vista-seccion').forEach(sec => sec.classList.remove('activa'));
+      document.querySelectorAll('.menu-items li').forEach(li => li.classList.remove('active'));
+      
+      document.getElementById(idSeccion).classList.add('activa');
+      elementoLi.classList.add('active');
+
+      if (idSeccion === 'asignaturas') {
+        cargarAsignaturasCRUD();
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
+      await cargarPanelHoy();
+
+      // Formulario de creación
+      const formAsig = document.getElementById('form-nueva-asig');
+      formAsig.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre = document.getElementById('nombre-asig').value;
+        const temas = parseInt(document.getElementById('temas-asig').value);
+        const dificultad = parseFloat(document.getElementById('dificultad-asig').value);
+        const fecha_examen = document.getElementById('fecha-asig').value;
+
+        const { error } = await supabaseClient
+          .from('asignaturas')
+          .insert([{ nombre, temas, dificultad, fecha_examen }]);
+
+        if (error) {
+          alert('Error al guardar: ' + error.message);
+        } else {
+          alert('¡Asignatura guardada con éxito!');
+          formAsig.reset();
+          cargarAsignaturasCRUD();
+          cargarPanelHoy();
+        }
+      });
+    });
+
+    // Cargar panel principal con cálculo dinámico
+    async function cargarPanelHoy() {
       const minutosDisponibles = 180; 
       const fechaHoy = new Date('2026-10-01');
 
-      // 1. OBTENER LOS DATOS DESDE LA NUBE (SUPABASE)
       const { data: asignaturas, error } = await supabaseClient
         .from('asignaturas')
         .select('*');
@@ -424,18 +568,17 @@
       contenedor.innerHTML = ""; 
 
       if (error || !asignaturas || asignaturas.length === 0) {
-        contenedor.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Error al conectar con Supabase: ${error ? error.message : 'Sin datos'}</p></div>`;
+        contenedor.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Sin asignaturas registradas.</p></div>`;
         return;
       }
 
-      // 2. EL CÁLCULO MATEMÁTICO CON LOS DATOS DE LA NUBE
       let asignaturasConUrgencia = [];
       let urgenciaTotal = 0;
 
       asignaturas.forEach(asig => {
         const fechaExamen = new Date(asig.fecha_examen);
         const diferenciaTiempo = fechaExamen - fechaHoy;
-        const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24)); 
+        const diasRestantes = Math.max(1, Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24))); 
         
         const puntosCarga = asig.temas * asig.dificultad;
         const urgencia = puntosCarga / diasRestantes;
@@ -456,14 +599,12 @@
         }
       });
 
-      // 3. PINTAR EL RESULTADO EN LA LÍNEA DE TIEMPO
       const franjasHorarias = ["10:00 - 11:30", "11:30 - 13:00", "13:00 - 14:00"];
 
       planDeHoy.forEach((plan, index) => {
         const horas = Math.floor(plan.minutos / 60);
         const mins = plan.minutos % 60;
         const textoTiempo = horas > 0 ? `${horas}h ${mins > 0 ? mins + 'm' : ''}` : `${mins}m`;
-
         const horaAsignada = franjasHorarias[index] || `Bloque ${index + 1}`;
 
         const itemTimeline = document.createElement('div');
@@ -483,7 +624,35 @@
         
         contenedor.appendChild(itemTimeline);
       });
-    });
+    }
+
+    // Cargar listado en la vista de Asignaturas
+    async function cargarAsignaturasCRUD() {
+      const contenedorCrud = document.getElementById('lista-asignaturas-crud');
+      contenedorCrud.innerHTML = "<p style='color: var(--texto-gris);'>Cargando...</p>";
+
+      const { data: asignaturas, error } = await supabaseClient
+        .from('asignaturas')
+        .select('*');
+
+      if (error || !asignaturas) {
+        contenedorCrud.innerHTML = "<p style='color: red;'>Error al cargar las materias.</p>";
+        return;
+      }
+
+      contenedorCrud.innerHTML = "";
+      asignaturas.forEach(asig => {
+        const div = document.createElement('div');
+        div.style.cssText = "padding: 12px; margin-bottom: 10px; background: var(--fondo); border-radius: 10px; display: flex; justify-content: space-between; align-items: center;";
+        div.innerHTML = `
+          <div>
+            <strong>${asig.nombre}</strong><br>
+            <span style="font-size: 12px; color: var(--texto-gris);">Temas: ${asig.temas} | Dificultad: ${asig.dificultad} | Examen: ${asig.fecha_examen}</span>
+          </div>
+        `;
+        contenedorCrud.appendChild(div);
+      });
+    }
   </script>
 </body>
 </html>
