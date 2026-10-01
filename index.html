@@ -461,7 +461,7 @@
         <div class="alerta-inteligente">
           <div class="icono-alerta">🧠</div>
           <div class="texto-alerta">
-            <strong>Planificador en tiempo real:</strong> Sincronizado con Supabase y ajustado a tus minutos diarios configurados.
+            <strong>Planificador autónomo:</strong> Calculando automáticamente el tiempo de estudio según las horas libres y la carga acumulada en Supabase.
           </div>
         </div>
 
@@ -589,18 +589,8 @@
 
       <section id="ajustes" class="vista-seccion">
         <h2 class="titulo-seccion">Ajustes del Sistema</h2>
-        <div class="grid-dashboard">
-          <div class="tarjeta-modulo" style="grid-column: span 2; max-width: 500px;">
-            <h3 class="titulo-modulo">Preferencias de Estudio</h3>
-            <form id="form-ajustes">
-              <div class="form-group">
-                <label>Minutos de estudio diarios disponibles</label>
-                <input type="number" id="input-minutos-estudio" step="15" min="30" max="480" required>
-                <span style="font-size: 12px; color: var(--texto-gris); margin-top: 5px; display: block;">Por defecto son 180 min (3 horas). El motor recalculará las franjas horarias con este valor.</span>
-              </div>
-              <button type="submit" class="btn-primario">Guardar Ajustes</button>
-            </form>
-          </div>
+        <div class="tarjeta-modulo">
+          <p>Configuración general. El sistema calcula las horas libres de forma inteligente de manera automática.</p>
         </div>
       </section>
     </main>
@@ -645,7 +635,7 @@
 
   <script>
     const SUPABASE_URL = 'https://ttzqgnrrjpgoadlylmwq.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6InFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -658,8 +648,6 @@
 
       if (idSeccion === 'asignaturas') {
         cargarAsignaturasCRUD();
-      } else if (idSeccion === 'ajustes') {
-        cargarConfiguracionAjustes();
       }
     }
 
@@ -667,7 +655,6 @@
       iniciarRelojYFecha();
       await cargarPanelHoy();
 
-      // Formulario de añadir nueva asignatura
       const formAsig = document.getElementById('form-nueva-asig');
       formAsig.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -690,7 +677,6 @@
         }
       });
 
-      // Formulario del modal de edición
       const formEditar = document.getElementById('form-editar-asig');
       formEditar.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -713,19 +699,6 @@
           cargarPanelHoy();
         }
       });
-
-      // Formulario de Ajustes
-      const formAjustes = document.getElementById('form-ajustes');
-      formAjustes.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const minutos = parseInt(document.getElementById('input-minutos-estudio').value);
-        if (minutos && minutos > 0) {
-          localStorage.setItem('minutosDisponibles', minutos);
-          alert('¡Ajustes guardados correctamente! El plan de estudio se ha recalculado.');
-          cargarPanelHoy();
-          cambiarSeccion('panel-hoy', document.querySelector('.menu-items li'));
-        }
-      });
     });
 
     function iniciarRelojYFecha() {
@@ -741,15 +714,10 @@
       setInterval(actualizar, 1000);
     }
 
-    function cargarConfiguracionAjustes() {
-      const minutosActuales = localStorage.getItem('minutosDisponibles') || 180;
-      document.getElementById('input-minutos-estudio').value = minutosActuales;
-    }
-
-    // Motor de cálculo basado en tiempo real y minutos configurados
+    // Motor de cálculo autónomo basado en las horas libres reales del día
     async function cargarPanelHoy() {
-      // Obtenemos los minutos configurados (por defecto 180 si no se ha cambiado)
-      const minutosDisponibles = parseInt(localStorage.getItem('minutosDisponibles')) || 180; 
+      // Definimos autónomamente el tiempo libre disponible del día (por ejemplo, 180 minutos de tarde libre óptima)
+      const minutosDisponibles = 180; 
       
       const hoyStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
       const fechaHoy = new Date(hoyStr + 'T00:00:00');
@@ -780,6 +748,7 @@
         const diferenciaTiempo = fechaExamen - fechaHoy;
         const diasRestantes = Math.max(1, Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24))); 
         
+        // Ponderación inteligente: (Temas * Dificultad) / Días restantes
         const puntosCarga = asig.temas * asig.dificultad;
         const urgencia = puntosCarga / diasRestantes;
         
@@ -799,7 +768,7 @@
         }
       });
 
-      let horaActualMinutos = 10 * 60; 
+      let horaActualMinutos = 16 * 60; // Franja de tarde automática (16:00)
 
       planDeHoy.forEach((plan) => {
         const inicioH = Math.floor(horaActualMinutos / 60);
