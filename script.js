@@ -34,22 +34,23 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const contenedor = document.getElementById('contenedor-plan');
-  contenedor.innerHTML = ''; 
+  contenedor.innerHTML = ""; 
 
-  // Variable para simular los bloques (Sesión 1, Sesión 2...)
-  let contadorSesion = 1;
+  // Franjas horarias asignadas para mostrar en la línea de tiempo
+  const franjasHorarias = ["10:00 - 11:30", "11:30 - 13:00", "13:00 - 14:00"];
 
-  planDeHoy.forEach(plan => {
+  planDeHoy.forEach((plan, index) => {
     const horas = Math.floor(plan.minutos / 60);
     const mins = plan.minutos % 60;
     const textoTiempo = horas > 0 ? `${horas}h ${mins > 0 ? mins + 'm' : ''}` : `${mins}m`;
 
-    // Creamos el elemento con la estructura exacta de la Timeline
+    const horaAsignada = franjasHorarias[index] || `Bloque ${index + 1}`;
+
     const itemTimeline = document.createElement('div');
     itemTimeline.className = 'timeline-item activo';
     
     itemTimeline.innerHTML = `
-      <div class="hora">Sesión ${contadorSesion}</div>
+      <div class="hora">${horaAsignada}</div>
       <div class="punto punto-estudio"></div>
       <div class="contenido-item tarjeta-estudio">
         <div class="info-estudio">
@@ -61,6 +62,5 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     
     contenedor.appendChild(itemTimeline);
-    contadorSesion++;
   });
 });
