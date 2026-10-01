@@ -445,7 +445,7 @@
         <div class="alerta-inteligente">
           <div class="icono-alerta">🧠</div>
           <div class="texto-alerta">
-            <strong>Ajuste automático:</strong> Sincronizado con Supabase. Plan optimizado ponderando temas y dificultad.
+            <strong>Ajuste automático:</strong> Sincronizado con Supabase. Plan optimizado mediante motor temporal dinámico.
           </div>
         </div>
 
@@ -464,6 +464,7 @@
                 </div>
               </div>
 
+              <!-- Bloques inyectados dinámicamente con cálculo de tiempo real -->
               <div id="contenedor-plan" style="display: contents;"></div>
 
               <div class="timeline-item">
@@ -616,7 +617,7 @@
 
   <script>
     const SUPABASE_URL = 'https://ttzqgnrrjpgoadlylmwq.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0enFnbnJyanBnb2FkbHlsbXdxIiwicm9sZSI6InFub24iLCJpYXQiOjE3OTA4ODY2NDcsImV4cCI6MjEwNjQ2MjY0N30.wD0QG3B4wCt1m9PhPRr0JzBonCSAtNpL4EpWFVx851I';
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -681,9 +682,11 @@
       });
     });
 
+    // Motor de cálculo con franjas horarias dinámicas y seguras
     async function cargarPanelHoy() {
       const minutosDisponibles = 180; 
-      const fechaHoy = new Date('2026-10-01');
+      // Normalización segura de fecha local para evitar desfases UTC
+      const fechaHoy = new Date('2026-10-01T00:00:00');
 
       const { data: asignaturas, error } = await supabaseClient
         .from('asignaturas')
@@ -693,7 +696,7 @@
       contenedor.innerHTML = ""; 
 
       if (error || !asignaturas || asignaturas.length === 0) {
-        contenedor.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Sin asignaturas registradas.</p></div>`;
+        contenedor.innerHTML = `<div class="tarjeta-base"><p style="color:red;">Sin asignaturas registradas en la nube.</p></div>`;
         return;
       }
 
@@ -701,11 +704,11 @@
       let urgenciaTotal = 0;
 
       asignaturas.forEach(asig => {
-        const fechaExamen = new Date(asig.fecha_examen);
+        const fechaExamen = new Date(asig.fecha_examen + 'T00:00:00');
         const diferenciaTiempo = fechaExamen - fechaHoy;
         const diasRestantes = Math.max(1, Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24))); 
         
-        // Ponderación exacta teniendo en cuenta la carga de temas y la dificultad de 1 a 5
+        // Ponderación exacta: Temas * Dificultad (1 a 5)
         const puntosCarga = asig.temas * asig.dificultad;
         const urgencia = puntosCarga / diasRestantes;
         
@@ -719,25 +722,36 @@
         let porcentaje = asig.urgencia / urgenciaTotal;
         let minutosAsignados = minutosDisponibles * porcentaje;
 
-        if (minutosAsignados >= 45) {
+        if (minutosAsignados >= 30) { // Umbral rebajado a 30m para mayor flexibilidad
           let minutosRedondeados = Math.round(minutosAsignados / 15) * 15;
           planDeHoy.push({ nombre: asig.nombre, minutos: minutosRedondeados });
         }
       });
 
-      const franjasHorarias = ["10:00 - 11:30", "11:30 - 13:00", "13:00 - 14:00"];
+      // Generador dinámico de horas (Inicia a las 10:00 AM y calcula bloques consecutivos reales)
+      let horaActualMinutos = 10 * 60; // 10:00 en minutos desde medianoche
 
-      planDeHoy.forEach((plan, index) => {
+      planDeHoy.forEach((plan) => {
+        const inicioH = Math.floor(horaActualMinutos / 60);
+        const inicioM = horaActualMinutos % 60;
+        const horaInicioStr = `${String(inicioH).padStart(2, '0')}:${String(inicioM).padStart(2, '0')}`;
+
+        horaActualMinutos += plan.minutos;
+        const finH = Math.floor(horaActualMinutos / 60);
+        const finM = horaActualMinutos % 60;
+        const horaFinStr = `${String(finH).padStart(2, '0')}:${String(finM).padStart(2, '0')}`;
+
+        const rangoHorario = `${horaInicioStr} - ${horaFinStr}`;
+
         const horas = Math.floor(plan.minutos / 60);
         const mins = plan.minutos % 60;
         const textoTiempo = horas > 0 ? `${horas}h ${mins > 0 ? mins + 'm' : ''}` : `${mins}m`;
-        const horaAsignada = franjasHorarias[index] || `Bloque ${index + 1}`;
 
         const itemTimeline = document.createElement('div');
         itemTimeline.className = 'timeline-item';
         
         itemTimeline.innerHTML = `
-          <div class="hora">${horaAsignada}</div>
+          <div class="hora">${rangoHorario}</div>
           <div class="columna-punto"><div class="punto punto-estudio"></div></div>
           <div class="tarjeta-estudio">
             <div class="contenido-item">
